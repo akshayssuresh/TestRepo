@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Payment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Bank Payment</h1>
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="accountHolder">Account Holder Name</label>
+                <input type="text" id="accountHolder" name="accountHolder" required>
+                <div class="error" id="holderError">Please enter a valid name</div>
+            </div>
+
+            <div class="form-group">
+                <label for="accountNumber">Account Number</label>
+                <input type="text" id="accountNumber" name="accountNumber" placeholder="1234567890" required>
+                <div class="error" id="accountError">Account number must be 10-16 digits</div>
+            </div>
+
+            <div class="form-group">
+                <label for="bankName">Bank Name</label>
+                <select id="bankName" name="bankName" required>
+                    <option value="">Select a bank</option>
+                    <option value="SBI">State Bank of India</option>
+                    <option value="HDFC">HDFC Bank</option>
+                    <option value="ICICI">ICICI Bank</option>
+                    <option value="Axis">Axis Bank</option>
+                    <option value="BOB">Bank of Baroda</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ifscCode">IFSC Code</label>
+                <input type="text" id="ifscCode" name="ifscCode" placeholder="SBIN0001234" required>
+                <div class="error" id="ifscError">IFSC code format is invalid</div>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount (₹)</label>
+                <input type="number" id="amount" name="amount" placeholder="0.00" min="1" step="0.01" required>
+                <div class="error" id="amountError">Please enter a valid amount</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="expiry">Card Expiry</label>
+                    <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+                    <div class="error" id="expiryError">Format should be MM/YY</div>
+                </div>
+                <div class="form-group">
+                    <label for="cvv">CVV</label>
+                    <input type="password" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                    <div class="error" id="cvvError">CVV must be 3-4 digits</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Payment Description</label>
+                <input type="text" id="description" name="description" placeholder="Enter payment details">
+            </div>
+
+            <button type="submit">Process Payment</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let isValid = true;
+            const accountHolder = document.getElementById('accountHolder').value.trim();
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const ifscCode = document.getElementById('ifscCode').value.trim().toUpperCase();
+            const amount = document.getElementById('amount').value;
+            const expiry = document.getElementById('expiry').value.trim();
+            const cvv = document.getElementById('cvv').value.trim();
+
+            // Validate account holder
+            if (accountHolder.length < 3) {
+                document.getElementById('holderError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('holderError').style.display = 'none';
+            }
+
+            // Validate account number
+            if (!/^\d{10,16}$/.test(accountNumber)) {
+                document.getElementById('accountError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('accountError').style.display = 'none';
+            }
+
+            // Validate IFSC code
+            if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscCode)) {
+                document.getElementById('ifscError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('ifscError').style.display = 'none';
+            }
+
+            // Validate amount
+            if (amount <= 0) {
+                document.getElementById('amountError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('amountError').style.display = 'none';
+            }
+
+            // Validate expiry
+            if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+                document.getElementById('expiryError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('expiryError').style.display = 'none';
+            }
+
+            // Validate CVV
+            if (!/^\d{3,4}$/.test(cvv)) {
+                document.getElementById('cvvError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('cvvError').style.display = 'none';
+            }
+
+            if (isValid) {
+                alert('Payment processed successfully!\n\nAccount: ' + accountHolder + '\nAmount: ₹' + amount);
+                this.reset();
+            }
+        });
+    </script>
+</body>
+
+</html>
